@@ -5,7 +5,7 @@ import renderer from './renderer';
 
 class Camera extends component(PerspectiveCamera) {
   constructor() {
-    super(35, 0, 0.1, 500);
+    super(35, 0, 0.1, 1000);
 
     this.position.set(0, 0, 10);
     this.lookAt(new Vector3(0, 0, 0));
