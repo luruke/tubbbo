@@ -7,12 +7,13 @@ const tier = getGPUTier({
   // forceMobile: true, // (Development) Force the use of mobile benchmarking scores
 });
 
-const dpr = Math.min(1.5, window.devicePixelRatio || 1);
+// const dpr = Math.min(1.5, window.devicePixelRatio || 1);
+const dpr = Math.min(1, window.devicePixelRatio || 1);
 
 const settings = {
   tier,
   dpr,
-  fxaa: true,
+  fxaa: false,
 };
 
 console.log(`⚙️ settings`, settings);
