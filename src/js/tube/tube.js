@@ -16,10 +16,10 @@ export default class extends component(Object3D) {
     const data = new Float32Array(WIDTH * HEIGHT * 4);
 
     this.points = [
-      new Vector4(10, 0, 0, 1),
-      new Vector4(0.2, .2, 0, 1),
-      new Vector4(-2.9, .7, .3, 1),
-      new Vector4(-4.5, .5, -.4, 1)
+      new Vector4(10, 0, 14, 1),
+      new Vector4(0.2, 0, 0, 1),
+      new Vector4(-2.9, 0, .3, 1),
+      new Vector4(-4.5, 0, -.4, 1)
     ];
 
     this.points.forEach((p, index) => {
@@ -35,10 +35,10 @@ export default class extends component(Object3D) {
       width: WIDTH,
       height: HEIGHT,
       name: 'velocity',
+      shader: require('./velocity.frag'),
       uniforms: {
         uTime: { value: 0 },
       },
-      shader: require('./velocity.frag')
     });
 
     this.curvepos = new FBO({
@@ -46,11 +46,18 @@ export default class extends component(Object3D) {
       width: WIDTH,
       height: HEIGHT,
       name: 'position',
+      shader: require('./position.frag'),
       uniforms: {
         uTime: { value: 0 },
         velocity: { value: this.velocity.target }
       },
     });
+
+    this.velocity.uniforms.uPosition = {
+      value: this.curvepos.target
+    };
+
+    // this.curvepos.update();
     
     this.geometry = new CylinderBufferGeometry(1, 1, 30, 20, 40, true);
     this.geometry.rotateZ(Math.PI / 2);
@@ -78,9 +85,14 @@ export default class extends component(Object3D) {
   onRaf({ delta }) {
     // this.mesh.rotation.x += 0.3 * delta;
     // this.mesh.rotation.y += 0.3 * delta;
+
     this.curvepos.uniforms.uTime.value += delta;
     this.velocity.uniforms.uTime.value += delta;
+
+    this.velocity.uniforms.uPosition.value = this.curvepos.target;
     this.velocity.update();
+
+    this.curvepos.uniforms.velocity.value = this.velocity.target;
     this.curvepos.update();
   }
 }

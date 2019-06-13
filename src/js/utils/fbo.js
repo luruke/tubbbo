@@ -122,7 +122,7 @@ export default class FBO {
     const old = this.rt[this.index];
     const dest = this.rt[destIndex];
 
-    this.material.uniforms.texture.value = this.copyData ? this.texture : this.target;
+    this.material.uniforms.texture.value = this.copyData ? this.texture : old.texture;
 
     const oldMainTarget = this.renderer.getRenderTarget();
     this.renderer.setRenderTarget(dest);

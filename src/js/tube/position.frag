@@ -9,5 +9,7 @@ void main() {
   vec4 oldValues = texture2D(texture, uv);
   oldValues.xyz += texture2D(velocity, uv).xyz;
 
+  // oldValues.y += .01;
+
   gl_FragColor = oldValues;
 }
