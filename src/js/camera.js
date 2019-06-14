@@ -5,9 +5,9 @@ import renderer from './renderer';
 
 class Camera extends component(PerspectiveCamera) {
   constructor() {
-    super(35, 0, 0.1, 5000);
+    super(35, 0, 0.1, 1000);
 
-    this.position.set(0, 0, 400);
+    this.position.set(0, 0, 200);
     this.lookAt(new Vector3(0, 0, 0));
     this.initOrbitControl();
   }
@@ -16,8 +16,8 @@ class Camera extends component(PerspectiveCamera) {
     const controls = new OrbitControls(this, renderer.domElement);
 
     controls.enabled = true;
-    controls.maxDistance = 1500;
-    controls.minDistance = 0;
+    controls.maxDistance = 900;
+    controls.minDistance = 30;
   }
 
   onResize({ ratio }) {

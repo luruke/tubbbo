@@ -118,6 +118,7 @@ export default class extends component(Object3D) {
     });
 
     this.mesh = new Mesh(this.geometry, this.material);
+    this.mesh.frustumCulled = false;
 
     this.add(this.mesh);
   }

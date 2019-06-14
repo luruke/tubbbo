@@ -12,6 +12,22 @@ varying float vAo;
 vec4 sRGBToLinear( in vec4 value ) {
 	return vec4( mix( pow( value.rgb * 0.9478672986 + vec3( 0.0521327014 ), vec3( 2.4 ) ), value.rgb * 0.0773993808, vec3( lessThanEqual( value.rgb, vec3( 0.04045 ) ) ) ), value.a );
 }
+// https://github.com/hughsk/glsl-fog/blob/master/exp.glsl
+float fogFactorExp(
+  const float dist,
+  const float density
+) {
+  return 1.0 - clamp(exp(-density * dist), 0.0, 1.0);
+}
+
+float fogFactorExp2(
+  const float dist,
+  const float density
+) {
+  const float LOG2 = -1.442695;
+  float d = density * dist;
+  return 1.0 - clamp(exp2(d * d * LOG2), 0.0, 1.0);
+}
 
 void main(){
 
@@ -39,6 +55,11 @@ void main(){
 
   float ao = pow(1.0 - vAo, 3.0);
   color.rgb = mix(color.rgb * 0.2, color.rgb, ao);
+
+  // color.rgb *= 1.0 - smoothstep(0.0, 200.0, vViewPosition.z);
+
+  // color.rgb = mix(color.rgb, vec3(0.0), fogFactorExp2(vViewPosition.z, 0.03));
+  color.rgb = mix(color.rgb, color.rgb * 0.1, smoothstep(0.0, 300.0, vViewPosition.z));
 
   gl_FragColor = color;
 }
