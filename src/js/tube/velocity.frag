@@ -120,11 +120,17 @@ void main() {
   vec4 newValue = oldValue;
 
   float curlSize = 0.001;
-  float speed = 0.01;
+  float speed = 0.02;
 
   newValue.xyz += curl(currentPosition.xyz * curlSize, uTime + uv.y * 100.23, 0.1) * speed;
+  newValue.xyz = mix(newValue.xyz, -newValue.xyz, length(newValue.xyz) * 0.3);
 
-  newValue.xyz = mix(newValue.xyz, -newValue.xyz, length(newValue.xyz) * 0.1);
+
+  if (newValue.a <= 0.0) {
+      newValue.a = 1.0;
+  }
+
+  newValue.a -= uTime * 0.001; // life
 
   gl_FragColor = newValue;
 }

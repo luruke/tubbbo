@@ -9,20 +9,30 @@ import {
   Vector2,
   InstancedBufferGeometry,
   InstancedBufferAttribute,
+  Texture,
+  RepeatWrapping,
 } from 'three';
 import MagicShader, { gui } from 'magicshader';
 import FBO from '../utils/fbo';
+import assets from '../assets';
 
 export default class extends component(Object3D) {
   init() {
     const INSTANCES = 512;
     const WIDTH = 64;
     const HEIGHT = INSTANCES;
-    const data = new Float32Array(WIDTH * HEIGHT * 4);
     
     this.stop = false;
 
+    const velocityData = new Float32Array(1 * HEIGHT * 4);
+
+    for (let i = 0; i < velocityData.length; i += 4) {
+      velocityData[i + 3] = i / velocityData.length; // take the alpha part
+      // velocityData[i + 3] = 200;
+    }
+
     this.velocity = new FBO({
+      data: velocityData,
       width: 1, // Only the head needs velocity
       height: HEIGHT,
       name: 'velocity',
@@ -33,7 +43,6 @@ export default class extends component(Object3D) {
     });
 
     this.curvepos = new FBO({
-      data,
       width: WIDTH,
       height: HEIGHT,
       name: 'position',
@@ -52,7 +61,10 @@ export default class extends component(Object3D) {
 
     // this.curvepos.update();
     
-    const cylinder = new CylinderBufferGeometry(1, 1, 1, 50, 50, true);
+    const radialSegment = 50;
+    const heightSegment = 50;
+
+    const cylinder = new CylinderBufferGeometry(1, 1, 1, radialSegment, heightSegment, true);
     cylinder.rotateZ(Math.PI / 2);
 
     this.geometry = new InstancedBufferGeometry().copy(cylinder);
@@ -79,17 +91,26 @@ export default class extends component(Object3D) {
     this.geometry.addAttribute('aAngle', new BufferAttribute(new Float32Array(angles), 1));
     this.geometry.addAttribute('aIndex', new InstancedBufferAttribute(new Float32Array(indexes), 1));
 
+    this.matcap = new Texture();
+
+    assets.resources.matcap.loading.then(res => {
+      const tex = new Texture(res.meta.data, RepeatWrapping, RepeatWrapping);
+      tex.needsUpdate = true;
+      this.material.uniforms.uMatcap.value = tex;
+    });
+
     this.material = new MagicShader({
       // wireframe: true,
       name: 'Tube',
+      extensions: {
+        derivatives: true,
+      },
       defines: {
         RESOLUTION: `vec2(${WIDTH.toFixed(1)}, ${HEIGHT.toFixed(1)})`
-        // PATH_LENGTH: (POINTS).toFixed(1),
-        // PATH_MAX: (POINTS - 1).toFixed(1)
       },
       uniforms: {
         uData: { value: this.curvepos.target },
-        // uPath: { value: this.points },
+        uMatcap: { value: this.matcap }
       },
       // side: DoubleSide,
       vertexShader: require('./tube.vert'),
@@ -106,9 +127,6 @@ export default class extends component(Object3D) {
   }
 
   onRaf({ delta }) {
-    // this.mesh.rotation.x += 0.3 * delta;
-    // this.mesh.rotation.y += 0.3 * delta;
-
     if (this.stop) {
       return;
     }

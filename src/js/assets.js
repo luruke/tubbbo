@@ -5,8 +5,8 @@ import deferred from './utils/deferred';
 const Resource = Loader.Resource;
 const RESOURCES = [
   {
-    name: 'photo',
-    url: require('/assets/photo.jpg')
+    name: 'matcap',
+    url: require('/assets/matcap.jpg')
   },
 
   //  {

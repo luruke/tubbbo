@@ -15,14 +15,13 @@ uniform sampler2D uData;
 
 varying vec2 vUv;
 varying vec3 vNormal;
+varying vec3 vViewPosition;
 
 const float pixelWidth = 1.0 / (RESOLUTION.x);
 
 void main(){
   vUv = uv;
   vec2 volume = vec2(0.8, 0.8);
-
-  // vec2 volume = vec2(uv.y * 3.0 + 1.0);
 
   // https://mattdesl.svbtle.com/shaping-curves-with-parametric-equations
   vec3 cur = texture2D(uData, vec2(vUv.y, aIndex)).xyz;
@@ -39,15 +38,18 @@ void main(){
   float circY = sin(tubeAngle);
 
   vec3 calculatedNormal = normalize(B * circX + N * circY);
+
+  if (vUv.y <= 0.02 || vUv.y >= 0.98) {
+    calculatedNormal = normalize(cur - next);
+  }
+
   vNormal = normalize(normalMatrix * calculatedNormal);
+
   vec3 pos = cur + B * volume.x * circX + N * volume.y * circY;
 
-  // pos = cur + (normal * 1.0);
-  // vNormal = normalize(normalMatrix * normal);
 
-  // pos.y += aIndex;
+  vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
+  vViewPosition = - mvPosition.xyz;
 
-  // pos *= 0.05;
-  
   gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
 }
