@@ -5,9 +5,9 @@ import renderer from './renderer';
 
 class Camera extends component(PerspectiveCamera) {
   constructor() {
-    super(35, 0, 0.1, 1000);
+    super(35, 0, 0.1, 5000);
 
-    this.position.set(0, 0, 10);
+    this.position.set(0, 0, 400);
     this.lookAt(new Vector3(0, 0, 0));
     this.initOrbitControl();
   }

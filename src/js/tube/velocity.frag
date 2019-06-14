@@ -114,49 +114,29 @@ vec3 curl(in vec3 p, in float noiseTime, in float persistence) {
 void main() {
   float pixelWidth = 1.0 / RESOLUTION.x;
   vec2 uv = gl_FragCoord.xy / RESOLUTION.xy;
-  vec4 oldValue = texture2D(texture, uv);
-  vec4 newValue = oldValue;
-  vec4 currentPosition = texture2D(uPosition, uv);
+  vec4 newValue = vec4(0.0);
 
   if (uv.x <= pixelWidth) {
+    vec4 oldValue = texture2D(texture, uv);
+    vec4 currentPosition = texture2D(uPosition, uv);
 
-    float distanceAttraction = 0.0230;
-    float speed = 0.18;
-    float curlTime = 6.3000;
-    float curlSize = 0.00360;
-    float basePersistence = 0.1150;
-    float life = 0.5;
-    float dyingPersistence = 0.5;
-
-    // vec3 cpos = currentPosition.xyz;
-    // const vec3 emitterPos = vec3(0.0);
-    // vec3 direction = emitterPos - cpos;
-    // cpos += direction * distanceAttraction * length(direction) * speed;
-    // cpos += curl(cpos * curlSize, uTime * curlTime, basePersistence + (1.0 - life) * dyingPersistence) * speed;
-    // cpos = mix(cpos, oldValue.xyz, step(1.0, abs(dot(normalize(cpos - oldValue.xyz), vec3(0.0, 1.0, 0.0)))));
-
-    newValue.xyz += curl(currentPosition.xyz * 4.1, uTime * .0001, 0.3) * 0.01;
-
-  } else {
-    // follow
-    vec4 pixelToFollow = texture2D(uPosition, uv - vec2(pixelWidth, 0.0));
-    vec3 direction = normalize(pixelToFollow.xyz - currentPosition.xyz);
-    // newValue.xyz += direction * 0.00000001;
-    // newValue.xyz += direction * 0.001;
-
-    // float speed = smoothstep(0.6, 1.1, distance(pixelToFollow.xyz, currentPosition.xyz));
-    // newValue.xyz += (direction * 0.1);
-
-    newValue.xyz = mix(oldValue.xyz, direction * 3.0, .4);
+    //uv.y
+    newValue.xyz = oldValue.xyz + curl(currentPosition.xyz * 4.1 + uv.y, uTime * .0001, 0.3) * 0.01;
   }
+//   else {
+//     // follow
+//     vec4 pixelToFollow = texture2D(uPosition, uv - vec2(pixelWidth, 0.0));
+//     vec3 direction = normalize(pixelToFollow.xyz - currentPosition.xyz);
+//     // newValue.xyz += direction * 0.00000001;
+//     // newValue.xyz += direction * 0.001;
 
-  newValue *= 0.99;
+//     // float speed = smoothstep(0.6, 1.1, distance(pixelToFollow.xyz, currentPosition.xyz));
+//     // newValue.xyz += (direction * 0.1);
 
-  // oldValue.y += .002;
+//     newValue.xyz = mix(oldValue.xyz, direction * 3.0, .4);
+//   }
 
-  // oldValue.xyz += curlNoise(oldValue.xyz) * 0.01;
-  // oldValue.w = 1.0;
+  // newValue *= 0.99;
 
   gl_FragColor = newValue;
-  gl_FragColor.a = 1.0;
 }

@@ -7,6 +7,8 @@ import {
   Vector4,
   BufferAttribute,
   Vector2,
+  InstancedBufferGeometry,
+  InstancedBufferAttribute,
 } from 'three';
 import MagicShader, { gui } from 'magicshader';
 import FBO from '../utils/fbo';
@@ -14,8 +16,9 @@ import FBO from '../utils/fbo';
 export default class extends component(Object3D) {
   init() {
     // const POINTS = 512;
-    const WIDTH = 256;
-    const HEIGHT = 1;
+    const INSTANCES = 1024;
+    const WIDTH = 128;
+    const HEIGHT = INSTANCES;
     const data = new Float32Array(WIDTH * HEIGHT * 4);
     
     this.stop = false;
@@ -72,10 +75,14 @@ export default class extends component(Object3D) {
 
     // this.curvepos.update();
     
-    this.geometry = new CylinderBufferGeometry(1, 1, 1, 50, 50, true);
+    const cylinder = new CylinderBufferGeometry(1, 1, 1, 50, 50, true);
+    cylinder.rotateZ(Math.PI / 2);
+
+    this.geometry = new InstancedBufferGeometry().copy(cylinder);
 
     const tmp = new Vector2();
     const angles = [];
+    const indexes = [];
     const dat = this.geometry.attributes.position.array;
 
     for (let i = 0; i < this.geometry.attributes.position.count; i++) {
@@ -88,9 +95,13 @@ export default class extends component(Object3D) {
       angles.push(Math.atan2(tmp.y, tmp.x));
     }
 
-    this.geometry.addAttribute('aAngle', new BufferAttribute(new Float32Array(angles), 1));
+    for (let i = 0; i < INSTANCES; i++) {
+      indexes.push(i / INSTANCES);
+    }
 
-    this.geometry.rotateZ(Math.PI / 2);
+    this.geometry.addAttribute('aAngle', new BufferAttribute(new Float32Array(angles), 1));
+    this.geometry.addAttribute('aIndex', new InstancedBufferAttribute(new Float32Array(indexes), 1));
+
     this.material = new MagicShader({
       // wireframe: true,
       name: 'Tube',
