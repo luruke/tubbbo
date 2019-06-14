@@ -4,12 +4,11 @@ uniform sampler2D texture;
 uniform sampler2D uPosition;
 uniform float uTime;
 
-// #pragma glslify: curlNoise = require(glsl-curl-noise)
-
 uniform float noiseSize; // ms({ value: 0.0, step: 0.001, range: [0, 1] })
 uniform float noiseImp; // ms({ value: 0.0, step: 0.001, range: [0, 1] })
 
 const int OCTAVES = 3;
+
 vec4 mod289(vec4 x) {
     return x - floor(x * (1.0 / 289.0)) * 289.0;
 }
@@ -94,6 +93,7 @@ vec4 simplexNoiseDerivatives (vec4 v) {
     float dw = temp0[0] * x0.w + temp0[1] * x1.w + temp0[2] * x2.w + temp1[0] * x3.w + temp1[1] * x4.w + mmm0[0] * p0.w + mmm0[1] * p1.w + mmm0[2] * p2.w + mmm1[0] * p3.w + mmm1[1] * p4.w;
     return vec4(dx, dy, dz, dw) * 49.0;
 }
+
 vec3 curl(in vec3 p, in float noiseTime, in float persistence) {
     vec4 xNoisePotentialDerivatives = vec4(0.0);
     vec4 yNoisePotentialDerivatives = vec4(0.0);
@@ -114,29 +114,17 @@ vec3 curl(in vec3 p, in float noiseTime, in float persistence) {
 void main() {
   float pixelWidth = 1.0 / RESOLUTION.x;
   vec2 uv = gl_FragCoord.xy / RESOLUTION.xy;
-  vec4 newValue = vec4(0.0);
 
-  if (uv.x <= pixelWidth) {
-    vec4 oldValue = texture2D(texture, uv);
-    vec4 currentPosition = texture2D(uPosition, uv);
+  vec4 oldValue = texture2D(texture, uv);
+  vec4 currentPosition = texture2D(uPosition, uv);
+  vec4 newValue = oldValue;
 
-    //uv.y
-    newValue.xyz = oldValue.xyz + curl(currentPosition.xyz * 4.1 + uv.y, uTime * .0001, 0.3) * 0.01;
-  }
-//   else {
-//     // follow
-//     vec4 pixelToFollow = texture2D(uPosition, uv - vec2(pixelWidth, 0.0));
-//     vec3 direction = normalize(pixelToFollow.xyz - currentPosition.xyz);
-//     // newValue.xyz += direction * 0.00000001;
-//     // newValue.xyz += direction * 0.001;
+  float curlSize = 0.001;
+  float speed = 0.01;
 
-//     // float speed = smoothstep(0.6, 1.1, distance(pixelToFollow.xyz, currentPosition.xyz));
-//     // newValue.xyz += (direction * 0.1);
+  newValue.xyz += curl(currentPosition.xyz * curlSize, uTime + uv.y * 100.23, 0.1) * speed;
 
-//     newValue.xyz = mix(oldValue.xyz, direction * 3.0, .4);
-//   }
-
-  // newValue *= 0.99;
+  newValue.xyz = mix(newValue.xyz, -newValue.xyz, length(newValue.xyz) * 0.1);
 
   gl_FragColor = newValue;
 }

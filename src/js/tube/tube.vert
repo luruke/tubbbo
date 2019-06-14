@@ -20,7 +20,9 @@ const float pixelWidth = 1.0 / (RESOLUTION.x);
 
 void main(){
   vUv = uv;
-  vec2 volume = vec2(1.0, 1.0);
+  vec2 volume = vec2(0.8, 0.8);
+
+  // vec2 volume = vec2(uv.y * 3.0 + 1.0);
 
   // https://mattdesl.svbtle.com/shaping-curves-with-parametric-equations
   vec3 cur = texture2D(uData, vec2(vUv.y, aIndex)).xyz;
@@ -43,7 +45,9 @@ void main(){
   // pos = cur + (normal * 1.0);
   // vNormal = normalize(normalMatrix * normal);
 
-  pos.y += aIndex;
+  // pos.y += aIndex;
+
+  // pos *= 0.05;
   
   gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
 }

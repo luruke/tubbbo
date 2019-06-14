@@ -15,38 +15,15 @@ import FBO from '../utils/fbo';
 
 export default class extends component(Object3D) {
   init() {
-    // const POINTS = 512;
-    const INSTANCES = 1024;
-    const WIDTH = 128;
+    const INSTANCES = 512;
+    const WIDTH = 64;
     const HEIGHT = INSTANCES;
     const data = new Float32Array(WIDTH * HEIGHT * 4);
     
     this.stop = false;
-    // for (let i = 0; i < data.length; i+=4) {
-    //   data[i + 0] = i * 20;
-    //   data[i + 1] = 0;
-    //   data[i + 2] = 0;
-    //   data[i + 3] = 0;
-    // }
-
-    // this.points = [
-    //   new Vector4(0, 0, 0, 0),
-    //   new Vector4(0, 0, 0, 0),
-    //   new Vector4(0, 0, 0, 0),
-    //   new Vector4(0, 0, 0, 0),
-    // ];
-
-    // this.points.forEach((p, index) => {
-    //   const i = index * 4;
-
-    //   data[i + 0] = p.x;
-    //   data[i + 1] = p.y;
-    //   data[i + 2] = p.z;
-    //   data[i + 3] = p.w;
-    // })
 
     this.velocity = new FBO({
-      width: WIDTH,
+      width: 1, // Only the head needs velocity
       height: HEIGHT,
       name: 'velocity',
       shader: require('./velocity.frag'),
@@ -114,7 +91,7 @@ export default class extends component(Object3D) {
         uData: { value: this.curvepos.target },
         // uPath: { value: this.points },
       },
-      side: DoubleSide,
+      // side: DoubleSide,
       vertexShader: require('./tube.vert'),
       fragmentShader: require('./tube.frag')
     });
