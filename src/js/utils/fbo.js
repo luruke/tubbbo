@@ -29,7 +29,10 @@ export const isAvailable = (() => {
   return true;
 })();
 
-const type = FloatType; // or HalfFloatType
+const iOS = /(iPad|iPhone|iPod)/g.test(navigator.userAgent);
+const type = iOS ? HalfFloatType : FloatType;
+
+// TODO: use Camera instad of OrthographicCamera?
 
 export default class FBO {
   constructor({

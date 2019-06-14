@@ -16,6 +16,8 @@ import { component } from 'bidello';
 import vertexShader from './postfx.vert';
 import fragmentShader from './postfx.frag';
 
+// TODO: use Camera instad of OrthographicCamera?
+
 class PostFX extends component() {
   init() {
     this.renderer = renderer;
