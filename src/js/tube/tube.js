@@ -5,31 +5,42 @@ import {
   Mesh,
   DoubleSide,
   Vector4,
+  BufferAttribute,
+  Vector2,
 } from 'three';
-import MagicShader from 'magicshader';
+import MagicShader, { gui } from 'magicshader';
 import FBO from '../utils/fbo';
 
 export default class extends component(Object3D) {
   init() {
-    const WIDTH = 4;
+    // const POINTS = 512;
+    const WIDTH = 256;
     const HEIGHT = 1;
     const data = new Float32Array(WIDTH * HEIGHT * 4);
+    
+    this.stop = false;
+    // for (let i = 0; i < data.length; i+=4) {
+    //   data[i + 0] = i * 20;
+    //   data[i + 1] = 0;
+    //   data[i + 2] = 0;
+    //   data[i + 3] = 0;
+    // }
 
-    this.points = [
-      new Vector4(10, 0, 14, 1),
-      new Vector4(0.2, 0, 0, 1),
-      new Vector4(-2.9, 0, .3, 1),
-      new Vector4(-4.5, 0, -.4, 1)
-    ];
+    // this.points = [
+    //   new Vector4(0, 0, 0, 0),
+    //   new Vector4(0, 0, 0, 0),
+    //   new Vector4(0, 0, 0, 0),
+    //   new Vector4(0, 0, 0, 0),
+    // ];
 
-    this.points.forEach((p, index) => {
-      const i = index * 4;
+    // this.points.forEach((p, index) => {
+    //   const i = index * 4;
 
-      data[i + 0] = p.x;
-      data[i + 1] = p.y;
-      data[i + 2] = p.z;
-      data[i + 3] = p.w;
-    })
+    //   data[i + 0] = p.x;
+    //   data[i + 1] = p.y;
+    //   data[i + 2] = p.z;
+    //   data[i + 3] = p.w;
+    // })
 
     this.velocity = new FBO({
       width: WIDTH,
@@ -53,20 +64,40 @@ export default class extends component(Object3D) {
       },
     });
 
+    this.velocity.material.gui.add(this, 'stop');
+
     this.velocity.uniforms.uPosition = {
       value: this.curvepos.target
     };
 
     // this.curvepos.update();
     
-    this.geometry = new CylinderBufferGeometry(1, 1, 30, 20, 40, true);
+    this.geometry = new CylinderBufferGeometry(1, 1, 1, 50, 50, true);
+
+    const tmp = new Vector2();
+    const angles = [];
+    const dat = this.geometry.attributes.position.array;
+
+    for (let i = 0; i < this.geometry.attributes.position.count; i++) {
+      const index = i * 3;
+      const x = dat[index + 0]; // x
+      const y = dat[index + 1]; // y
+      const z = dat[index + 2]; // z
+
+      tmp.set(y, z).normalize();
+      angles.push(Math.atan2(tmp.y, tmp.x));
+    }
+
+    this.geometry.addAttribute('aAngle', new BufferAttribute(new Float32Array(angles), 1));
+
     this.geometry.rotateZ(Math.PI / 2);
     this.material = new MagicShader({
-      wireframe: true,
+      // wireframe: true,
       name: 'Tube',
       defines: {
-        PATH_LENGTH: (4).toFixed(1),
-        PATH_MAX: (4 - 1).toFixed(1)
+        RESOLUTION: `vec2(${WIDTH.toFixed(1)}, ${HEIGHT.toFixed(1)})`
+        // PATH_LENGTH: (POINTS).toFixed(1),
+        // PATH_MAX: (POINTS - 1).toFixed(1)
       },
       uniforms: {
         uData: { value: this.curvepos.target },
@@ -82,9 +113,17 @@ export default class extends component(Object3D) {
     this.add(this.mesh);
   }
 
+  stop() {
+    this.stop = !this.stop;
+  }
+
   onRaf({ delta }) {
     // this.mesh.rotation.x += 0.3 * delta;
     // this.mesh.rotation.y += 0.3 * delta;
+
+    if (this.stop) {
+      return;
+    }
 
     this.curvepos.uniforms.uTime.value += delta;
     this.velocity.uniforms.uTime.value += delta;
