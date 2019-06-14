@@ -7,6 +7,7 @@ uniform vec3 color;// ms({ value: '#ff0000' })
 varying vec2 vUv;
 varying vec3 vNormal;
 varying vec3 vViewPosition;
+varying float vAo;
 
 vec4 sRGBToLinear( in vec4 value ) {
 	return vec4( mix( pow( value.rgb * 0.9478672986 + vec3( 0.0521327014 ), vec3( 2.4 ) ), value.rgb * 0.0773993808, vec3( lessThanEqual( value.rgb, vec3( 0.04045 ) ) ) ), value.a );
@@ -32,6 +33,9 @@ void main(){
 
   vec4 color = sRGBToLinear(texture2D(uMatcap, uv));
 
+  // color *= 1.0 - (vAo * 0.01);
+
+  color -= 1.0 - pow(vAo, 40.0);
 
   gl_FragColor = color;
 }

@@ -18,7 +18,7 @@ import assets from '../assets';
 
 export default class extends component(Object3D) {
   init() {
-    const INSTANCES = 512;
+    const INSTANCES = 500;
     const WIDTH = 64;
     const HEIGHT = INSTANCES;
     
@@ -61,8 +61,8 @@ export default class extends component(Object3D) {
 
     // this.curvepos.update();
     
-    const radialSegment = 50;
-    const heightSegment = 50;
+    const radialSegment = 20;// 50;
+    const heightSegment = 150;// 50;
 
     const cylinder = new CylinderBufferGeometry(1, 1, 1, radialSegment, heightSegment, true);
     cylinder.rotateZ(Math.PI / 2);

@@ -16,6 +16,7 @@ uniform sampler2D uData;
 varying vec2 vUv;
 varying vec3 vNormal;
 varying vec3 vViewPosition;
+varying float vAo;
 
 const float pixelWidth = 1.0 / (RESOLUTION.x);
 
@@ -50,6 +51,9 @@ void main(){
 
   vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
   vViewPosition = - mvPosition.xyz;
+
+  // vAo = length(normalize(cross(cur, next)));
+  vAo = length(normalize(cur - next));
 
   gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
 }
