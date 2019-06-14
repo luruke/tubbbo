@@ -56,10 +56,10 @@ void main(){
   // vAo = length(normalize(cross(cur, next)));
   // vAo = 1.0 - length(normalize(cur - next));
 
-  vAo = abs(cross(
+  vAo = length(abs(cross(
     normalize(cur - next),
     normalize(next - next2)
-  ).x);
+  )));
 
   gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
 }
