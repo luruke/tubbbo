@@ -35,7 +35,10 @@ void main(){
 
   // color *= 1.0 - (vAo * 0.01);
 
-  color -= 1.0 - pow(vAo, 40.0);
+  // color -= vAo * .8;
+
+  float ao = pow(1.0 - vAo, 4.0);
+  color.rgb = mix(color.rgb * 0.1, color.rgb, ao);
 
   gl_FragColor = color;
 }

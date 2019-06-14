@@ -27,6 +27,7 @@ void main(){
   // https://mattdesl.svbtle.com/shaping-curves-with-parametric-equations
   vec3 cur = texture2D(uData, vec2(vUv.y, aIndex)).xyz;
   vec3 next = texture2D(uData, vec2(vUv.y - pixelWidth, aIndex)).xyz;
+  vec3 next2 = texture2D(uData, vec2(vUv.y - pixelWidth * 2.0, aIndex)).xyz;
 
   // compute the Frenet-Serret frame
   vec3 T = normalize(next - cur);
@@ -53,7 +54,12 @@ void main(){
   vViewPosition = - mvPosition.xyz;
 
   // vAo = length(normalize(cross(cur, next)));
-  vAo = length(normalize(cur - next));
+  // vAo = 1.0 - length(normalize(cur - next));
+
+  vAo = abs(cross(
+    normalize(cur - next),
+    normalize(next - next2)
+  ).x);
 
   gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
 }
