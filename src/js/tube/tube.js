@@ -1,4 +1,5 @@
 import { component } from 'bidello';
+
 import {
   Object3D,
   CylinderBufferGeometry,
@@ -15,6 +16,11 @@ import {
   Vector3,
   AdditiveBlending,
 } from 'three';
+
+import {
+  lerp
+} from 'math-toolbox';
+
 import MagicShader, { gui } from 'magicshader';
 import FBO from '../utils/fbo';
 import assets from '../assets';
@@ -28,6 +34,8 @@ export default class extends component(Object3D) {
     const HEIGHT = INSTANCES;
     
     this.mousePos = new Vector3();
+    this.oldMousePos = new Vector2();
+    this.angle = 0;
     this.stop = false;
 
     const velocityData = new Float32Array(1 * HEIGHT * 4);
@@ -58,7 +66,8 @@ export default class extends component(Object3D) {
       uniforms: {
         uTime: { value: 0 },
         velocity: { value: this.velocity.target },
-        uMousePos: { value: this.mousePos }
+        uMousePos: { value: this.mousePos },
+        uMouseAngle: { value: this.angle },
       },
     });
 
@@ -144,7 +153,8 @@ export default class extends component(Object3D) {
       uniforms: {
         uData: { value: this.curvepos.target },
         uMatcap: { value: this.matcap },
-        uMousePos: { value: this.mousePos }
+        uMousePos: { value: this.mousePos },
+        uMouseAngle: { value: this.angle },
       },
       // side: DoubleSide,
       vertexShader: require('./tube.vert'),
@@ -167,6 +177,15 @@ export default class extends component(Object3D) {
 
   onRaf({ delta }) {
     this.mousePos.lerp(pointer.world, .1);
+
+    if (pointer.y !== this.oldMousePos.y && pointer.x !== this.oldMousePos.x) {
+      this.angle = Math.atan2(pointer.y - this.oldMousePos.y, pointer.x - this.oldMousePos.x);
+    }
+
+    this.curvepos.uniforms.uMouseAngle.value = lerp(this.curvepos.uniforms.uMouseAngle.value, this.angle, .1);
+    this.material.uniforms.uMouseAngle.value = this.curvepos.uniforms.uMouseAngle.value;
+
+    this.oldMousePos.set(pointer.x, pointer.y);
 
     if (this.stop) {
       return;

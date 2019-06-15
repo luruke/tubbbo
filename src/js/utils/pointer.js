@@ -107,11 +107,14 @@ class Pointer {
       this.move.y = e.y - this.hold.y;
     }
 
+    // if (this.last.x !== e.x || this.last.y !== e.y) {
+    //   this.last.set(this.x, this.y);
+    // }
+
     this.x = e.x;
     this.y = e.y;
     this.delta.x = e.x - this.last.x;
     this.delta.y = e.y - this.last.y;
-    this.last.set(e.x, e.y);
 
     this.distance += this.delta.length();
 

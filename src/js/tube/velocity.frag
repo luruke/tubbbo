@@ -119,8 +119,7 @@ void main() {
 
   float curlSize = 0.001;
   float speed = 0.02;
-//   float spacing = uv.y * 100.23;
-  float spacing = uv.y * 20.23;
+  float spacing = uv.y * 20.0;
 
   newValue.xyz += curl(currentPosition.xyz * curlSize, uTime + spacing, 0.1) * speed;
   newValue.xyz = mix(newValue.xyz, -newValue.xyz, length(newValue.xyz) * 0.3);

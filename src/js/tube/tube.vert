@@ -12,6 +12,7 @@ uniform mat4 modelViewMatrix;
 uniform mat4 projectionMatrix;
 uniform mat3 normalMatrix;
 uniform sampler2D uData;
+uniform float uMouseAngle;
 
 varying float vProgress;
 varying vec3 vNormal;
@@ -31,6 +32,10 @@ float cubicOut(float t) {
   return f * f * f + 1.0;
 }
 
+float map(float value, float min1, float max1, float min2, float max2) {
+  return min2 + (value - min1) * (max2 - min2) / (max1 - min1);
+}
+
 void main(){
   float progress = 1.0 - (position.x + 1.0) / 2.0;
   vProgress = progress;
@@ -40,20 +45,27 @@ void main(){
   vec4 data = texture2D(uData, vec2(progress, aIndex));
   vLife = data.a;
 
-  // vec2 volume = vec2(0.8);
-  float volume = 0.8;
+  vec2 volume = vec2(0.8);
+  // float volume = 0.8;
 
-  // volume *= cubicOut(smoothstep(50.0, 200.0, vLife));
+  volume *= cubicOut(smoothstep(50.0, 200.0, vLife));
   volume *= cubicOut(clamp(smoothstep(LIFE, LIFE - 100.0, vLife), 0.0, 1.0));
-  // volume *= qinticOut(smoothstep(LIFE - 300.0, LIFE - 200.0, vLife));
 
   if (vLife <= 0.0) {
-    volume = 0.0;
+    volume = vec2(0.0);
   }
 
   vec3 cur = data.xyz;
   vec3 next = texture2D(uData, vec2(progress - pixelWidth, aIndex)).xyz;
   vec3 next2 = texture2D(uData, vec2(progress - pixelWidth * 2.0, aIndex)).xyz;
+
+  float introMul = cubicOut(clamp(smoothstep(LIFE, LIFE - 100.0, vLife), 0.0, 1.0));
+
+  float val = map(introMul, 0.0, 1.0, 0.88, 1.0);
+
+  cur *= val;
+  next *= val;
+  next2 *= val;
 
   // compute the Frenet-Serret frame
   vec3 T = normalize(next - cur);
@@ -69,12 +81,11 @@ void main(){
   vNormal = normalize(normalMatrix * calculatedNormal);
 
   // vec3 pos = cur + B * volume.x * circX + N * volume.y * circY;
-  vec3 pos = cur + calculatedNormal * volume;
+  vec3 pos = cur + calculatedNormal * volume.x;
 
   // pos.xyz -= cur;
-  // pos.xyz *= smoothstep(100.0, 120.0, vLife);
+  // pos.yz *= cubicOut(clamp(smoothstep(LIFE, LIFE - 100.0, vLife), 0.0, 1.0));
   // pos.xyz += cur;
-
 
   vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
   vViewPosition = - mvPosition.xyz;
