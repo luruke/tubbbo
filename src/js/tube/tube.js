@@ -32,6 +32,8 @@ export default class extends component(Object3D) {
     const INSTANCES = 100;
     const WIDTH = 64;
     const HEIGHT = INSTANCES;
+
+    gui.destroy();
     
     this.mousePos = new Vector3();
     this.oldMousePos = new Vector2();
