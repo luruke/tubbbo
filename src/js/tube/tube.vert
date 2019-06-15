@@ -18,17 +18,40 @@ varying vec3 vNormal;
 varying vec3 vViewPosition;
 varying vec3 wPos;
 varying float vAo;
+varying float vLife;
 
 const float pixelWidth = 1.0 / (RESOLUTION.x);
 
-void main(){
-  vec2 volume = vec2(0.8, 0.8);
+float qinticOut(float t) {
+  return 1.0 - (pow(t - 1.0, 5.0));
+}
 
+float cubicOut(float t) {
+  float f = t - 1.0;
+  return f * f * f + 1.0;
+}
+
+void main(){
   float progress = 1.0 - (position.x + 1.0) / 2.0;
   vProgress = progress;
 
   // https://mattdesl.svbtle.com/shaping-curves-with-parametric-equations
-  vec3 cur = texture2D(uData, vec2(progress, aIndex)).xyz;
+
+  vec4 data = texture2D(uData, vec2(progress, aIndex));
+  vLife = data.a;
+
+  // vec2 volume = vec2(0.8);
+  float volume = 0.8;
+
+  // volume *= cubicOut(smoothstep(50.0, 200.0, vLife));
+  volume *= cubicOut(clamp(smoothstep(LIFE, LIFE - 100.0, vLife), 0.0, 1.0));
+  // volume *= qinticOut(smoothstep(LIFE - 300.0, LIFE - 200.0, vLife));
+
+  if (vLife <= 0.0) {
+    volume = 0.0;
+  }
+
+  vec3 cur = data.xyz;
   vec3 next = texture2D(uData, vec2(progress - pixelWidth, aIndex)).xyz;
   vec3 next2 = texture2D(uData, vec2(progress - pixelWidth * 2.0, aIndex)).xyz;
 
@@ -46,7 +69,12 @@ void main(){
   vNormal = normalize(normalMatrix * calculatedNormal);
 
   // vec3 pos = cur + B * volume.x * circX + N * volume.y * circY;
-  vec3 pos = cur + calculatedNormal * 0.8;
+  vec3 pos = cur + calculatedNormal * volume;
+
+  // pos.xyz -= cur;
+  // pos.xyz *= smoothstep(100.0, 120.0, vLife);
+  // pos.xyz += cur;
+
 
   vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
   vViewPosition = - mvPosition.xyz;
@@ -64,6 +92,7 @@ void main(){
   // }
 
   wPos = (modelMatrix * vec4(pos, 1.0)).xyz;
+  
 
   gl_Position = projectionMatrix * mvPosition;
 }

@@ -20,8 +20,11 @@ void main() {
     // vec4 velocityData = texture2D(velocity, uv);
     // float speed = clamp(smoothstep(0.2, 0.5, velocityData.a), 0.0, 1.0);
     
-    if (head.a >= 300.0) {
-      oldValues.xyz += head.xyz;
+    if (head.a >= 1.0) {
+      // float speed = 1.0;
+
+      // speed += 1.0 - smoothstep(0.0, 50.0, head.a) * 4.0;
+      oldValues.xyz += head.xyz;// * speed;
     }
 
     // if (velocityData.a > RESOLUTION.x * 2.0) {
@@ -49,9 +52,12 @@ void main() {
   if (head.a <= 0.0) {
     // oldValues.xyz = vec3(0.0);
     oldValues.xyz = uMousePos;
+    oldValues.y += uv.x * 20.0;
   }
 
   // oldValues.y += .01;
+
+  oldValues.a = head.a;
 
   gl_FragColor = oldValues;
 }

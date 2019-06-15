@@ -10,6 +10,7 @@ varying vec3 vViewPosition;
 varying float vAo;
 varying float vProgress;
 varying vec3 wPos;
+varying float vLife;
 
 vec4 sRGBToLinear( in vec4 value ) {
 	return vec4( mix( pow( value.rgb * 0.9478672986 + vec3( 0.0521327014 ), vec3( 2.4 ) ), value.rgb * 0.0773993808, vec3( lessThanEqual( value.rgb, vec3( 0.04045 ) ) ) ), value.a );
@@ -37,10 +38,11 @@ void main(){
 
   
   // if (vProgress >= 0.75) {
-  //   vec3 vPos = vViewPosition;
-  //   vec3 fdx = vec3( dFdx( vPos.x ), dFdx( vPos.y ), dFdx( vPos.z ) );
-  //   vec3 fdy = vec3( dFdy( vPos.x ), dFdy( vPos.y ), dFdy( vPos.z ) );
-  //   normal = normalize( cross( fdx, fdy ) );
+  //   normal = vec3(0.0, 1.0, 0.0);
+  //   // vec3 vPos = vViewPosition;
+  //   // vec3 fdx = vec3( dFdx( vPos.x ), dFdx( vPos.y ), dFdx( vPos.z ) );
+  //   // vec3 fdy = vec3( dFdy( vPos.x ), dFdy( vPos.y ), dFdy( vPos.z ) );
+  //   // normal = normalize( cross( fdx, fdy ) );
   // }
   
   vec3 viewDir = normalize( vViewPosition );
@@ -53,26 +55,31 @@ void main(){
   // SSS - https://colinbarrebrisebois.com/2011/03/07/gdc-2011-approximating-translucency-for-a-fast-cheap-and-convincing-subsurface-scattering-look/
   // vec3 lightPos = vec3(0.0, 4.0, 0.0);
   vec3 lightPos = uMousePos;
-  vec3 ssLight = vec3(1.0);
-  vec3 fLTThickness = ssLight * pow(1.0 - vAo, 20.0);
-  float fLTScale = 0.5;
+  // lightPos.z -= 40.0;
+  vec3 ssLight = vec3(0.9, 0.9, 0.2);
+  vec3 fLTThickness = ssLight * pow(1.0 - vAo, 4.0);
+  float fLTScale = 4.6;
   float fLTDistortion = 0.18;
   float fLTAmbient = 0.0;
-  float iLTPower = 40.4;
-  float fLightAttenuation = 1.0 - smoothstep(0.0, 30.0, distance(lightPos, wPos));
+  float iLTPower = 30.4;
+
+  float dist = distance(lightPos, wPos);
+  float fLightAttenuation = (1.0 - clamp(pow(dist / 30.0, 4.0), 0.0, 1.0));
   vec3 vLight = normalize(-vViewPosition - lightPos);
   vec3 vLTLight = normalize(vLight + (normal * fLTDistortion));
   float fLTDot = pow(clamp(dot(viewDir, -vLTLight), 0.0, 1.0), iLTPower) * fLTScale;
   vec3 fLT = fLightAttenuation * (fLTDot + fLTAmbient) * fLTThickness;
-
   color.rgb += fLT;
 
   // fake "AO"
-  float ao = pow(1.0 - vAo, 3.0);
+  float ao = pow(1.0 - vAo, 2.0);
   color.rgb = mix(color.rgb * 0.2, color.rgb, ao);
 
   // Fog
   color.rgb = mix(color.rgb, color.rgb * 0.1, smoothstep(0.0, 300.0, vViewPosition.z));
+
+  // color.a = smoothstep(100.0, 120.0, vLife);
+  // color.a = smoothstep(100.0, 120.0, vLife);
 
   gl_FragColor = color;
 }

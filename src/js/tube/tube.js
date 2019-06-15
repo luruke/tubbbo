@@ -13,6 +13,7 @@ import {
   RepeatWrapping,
   MeshBasicMaterial,
   Vector3,
+  AdditiveBlending,
 } from 'three';
 import MagicShader, { gui } from 'magicshader';
 import FBO from '../utils/fbo';
@@ -22,7 +23,7 @@ import pointer from '../utils/pointer';
 export default class extends component(Object3D) {
   init() {
     const LIFE = 1500;
-    const INSTANCES = 150;
+    const INSTANCES = 100;
     const WIDTH = 64;
     const HEIGHT = INSTANCES;
     
@@ -131,12 +132,14 @@ export default class extends component(Object3D) {
 
     this.material = new MagicShader({
       // wireframe: true,
+      transparent: true,
       name: 'Tube',
       extensions: {
         derivatives: true,
       },
       defines: {
-        RESOLUTION: `vec2(${WIDTH.toFixed(1)}, ${HEIGHT.toFixed(1)})`
+        RESOLUTION: `vec2(${WIDTH.toFixed(1)}, ${HEIGHT.toFixed(1)})`,
+        LIFE: LIFE.toFixed(1),
       },
       uniforms: {
         uData: { value: this.curvepos.target },
