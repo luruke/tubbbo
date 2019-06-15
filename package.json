@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "parcel src/index.html --no-autoinstall --open",
-    "build": "rm -rf ./docs; parcel build src/index.html -d docs --public-url '.' --no-source-maps"
+    "build": "rm -rf ./docs; parcel build src/index.html -d docs --public-url '.' --no-source-maps; cp ./src/assets/social.jpg ./docs/social.jpg"
   },
   "repository": {
     "type": "git",
