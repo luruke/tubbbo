@@ -28,7 +28,8 @@ export default class extends component(Object3D) {
     const velocityData = new Float32Array(1 * HEIGHT * 4);
 
     for (let i = 0; i < velocityData.length; i += 4) {
-      velocityData[i + 3] = i / velocityData.length; // take the alpha part
+      // velocityData[i + 3] = i / velocityData.length; // take the alpha part
+      velocityData[i + 3] = (i / velocityData.length) * 500.0; // take the alpha part
     }
 
     this.velocity = new FBO({

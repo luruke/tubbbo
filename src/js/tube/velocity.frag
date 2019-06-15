@@ -7,7 +7,7 @@ uniform float uTime;
 uniform float noiseSize; // ms({ value: 0.0, step: 0.001, range: [0, 1] })
 uniform float noiseImp; // ms({ value: 0.0, step: 0.001, range: [0, 1] })
 
-const int OCTAVES = 3;
+const int OCTAVES = 2;
 
 vec4 mod289(vec4 x) {
     return x - floor(x * (1.0 / 289.0)) * 289.0;
@@ -122,17 +122,17 @@ void main() {
   float curlSize = 0.001;
   float speed = 0.02;
 //   float spacing = uv.y * 100.23;
-  float spacing = uv.y * 900.23;
+  float spacing = uv.y * 20.23;
 
   newValue.xyz += curl(currentPosition.xyz * curlSize, uTime + spacing, 0.1) * speed;
   newValue.xyz = mix(newValue.xyz, -newValue.xyz, length(newValue.xyz) * 0.3);
 
 
   if (newValue.a <= 0.0) {
-      newValue.a = 1.0;
+      newValue.a += 500.0;
+  } else {
+     newValue.a -= 1.0;
   }
-
-  newValue.a -= uTime * 0.001; // life
 
   gl_FragColor = newValue;
 }

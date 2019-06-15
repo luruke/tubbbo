@@ -15,12 +15,20 @@ void main() {
   vec2 uv = gl_FragCoord.xy / RESOLUTION.xy;
   vec4 oldValues = texture2D(texture, uv);
 
+  vec4 head = texture2D(velocity, vec2(0.0, uv.y));
+
   if (uv.x <= pixelWidth) {
-    vec4 velocityData = texture2D(velocity, uv);
-    oldValues.xyz += velocityData.xyz;
+    // vec4 velocityData = texture2D(velocity, uv);
+    // float speed = clamp(smoothstep(0.2, 0.5, velocityData.a), 0.0, 1.0);
     
-    // if (velocityData.a <= 0.0) {
-    //   oldValues.xyz = vec3(0.0);
+    if (head.a >= 300.0) {
+      oldValues.xyz += head.xyz;
+    }
+
+    // if (velocityData.a > RESOLUTION.x * 2.0) {
+    //   // oldValues.xyz = vec3(0.0);
+    // } else {
+    //   // oldValues.xyz = vec3(0.0);
     // }
     
   } else {
@@ -37,6 +45,10 @@ void main() {
     // t += qinticOut(1.0 - uv.x) * 0.8;
 
     oldValues.xyz = mix(oldValues.xyz, toFollow, t);
+  }
+
+  if (head.a <= 0.0) {
+    oldValues.xyz = vec3(0.0);
   }
 
   // oldValues.y += .01;

@@ -8,6 +8,7 @@ varying vec3 vNormal;
 varying vec3 vViewPosition;
 varying float vAo;
 varying float vProgress;
+varying vec3 wPos;
 
 vec4 sRGBToLinear( in vec4 value ) {
 	return vec4( mix( pow( value.rgb * 0.9478672986 + vec3( 0.0521327014 ), vec3( 2.4 ) ), value.rgb * 0.0773993808, vec3( lessThanEqual( value.rgb, vec3( 0.04045 ) ) ) ), value.a );
@@ -48,10 +49,28 @@ void main(){
 
   vec4 color = sRGBToLinear(texture2D(uMatcap, uv));
 
-  float ao = pow(1.0 - vAo, 3.0);
-  color.rgb = mix(color.rgb * 0.2, color.rgb, ao);
+  // SSS - https://colinbarrebrisebois.com/2011/03/07/gdc-2011-approximating-translucency-for-a-fast-cheap-and-convincing-subsurface-scattering-look/
+  vec3 lightPos = vec3(0.0, 0.0, 0.0);
+  vec3 fLTThickness = vec3(1.0) * pow(1.0 - vAo, 3.0);
+  
+  float fLTScale = 0.5;
+  float fLTDistortion = 0.18;
+  float fLTAmbient = 0.0;
+  float iLTPower = 20.4;
+  float fLightAttenuation = 1.0 - smoothstep(0.0, 10.0, distance(lightPos, wPos));
+  vec3 vLight = normalize(-vViewPosition - lightPos);
+  vec3 vLTLight = normalize(vLight + (normal * fLTDistortion));
+  float fLTDot = pow(clamp(dot(viewDir, -vLTLight), 0.0, 1.0), iLTPower) * fLTScale;
+  vec3 fLT = fLightAttenuation * (fLTDot + fLTAmbient) * fLTThickness;
+  color.rgb *= fLT;
+  
 
-  color.rgb = mix(color.rgb, color.rgb * 0.1, smoothstep(0.0, 300.0, vViewPosition.z));
+  // // fake "AO"
+  // float ao = pow(1.0 - vAo, 3.0);
+  // color.rgb = mix(color.rgb * 0.2, color.rgb, ao);
+
+  // // Fog
+  // color.rgb = mix(color.rgb, color.rgb * 0.1, smoothstep(0.0, 300.0, vViewPosition.z));
 
   gl_FragColor = color;
 }

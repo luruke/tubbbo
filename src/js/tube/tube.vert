@@ -16,6 +16,7 @@ uniform sampler2D uData;
 varying float vProgress;
 varying vec3 vNormal;
 varying vec3 vViewPosition;
+varying vec3 wPos;
 varying float vAo;
 
 const float pixelWidth = 1.0 / (RESOLUTION.x);
@@ -61,6 +62,8 @@ void main(){
   // } else if (vProgress == 1.0) {
   //   vNormal = normalize(next - cur);
   // }
+
+  wPos = (modelMatrix * vec4(pos, 1.0)).xyz;
 
   gl_Position = projectionMatrix * mvPosition;
 }
