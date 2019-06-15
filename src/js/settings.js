@@ -13,7 +13,7 @@ const dpr = Math.min(1.5, window.devicePixelRatio || 1);
 const settings = {
   tier,
   dpr,
-  fxaa: true,
+  fxaa: dpr <= 1,
 };
 
 console.log(`⚙️ settings`, settings);
