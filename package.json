@@ -31,5 +31,8 @@
     "resource-loader": "^2.2.4",
     "three": "^0.105.1"
   },
-  "dependencies": {}
+  "dependencies": {
+    "math-toolbox": "^1.12.0",
+    "utils": "^0.3.1"
+  }
 }

@@ -3,12 +3,11 @@ precision highp float;
 uniform sampler2D texture;
 uniform sampler2D velocity;
 uniform float uTime;
+uniform vec3 uMousePos;
 
-
-float qinticOut(float t) {
-  return 1.0 - (pow(t - 1.0, 5.0));
-}
-
+// float qinticOut(float t) {
+//   return 1.0 - (pow(t - 1.0, 5.0));
+// }
 
 void main() {
   float pixelWidth = 1.0 / RESOLUTION.x;
@@ -48,7 +47,8 @@ void main() {
   }
 
   if (head.a <= 0.0) {
-    oldValues.xyz = vec3(0.0);
+    // oldValues.xyz = vec3(0.0);
+    oldValues.xyz = uMousePos;
   }
 
   // oldValues.y += .01;

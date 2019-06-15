@@ -5,7 +5,7 @@ import {
   RGBAFormat,
   FloatType,
   HalfFloatType,
-  OrthographicCamera,
+  Camera,
   BufferGeometry,
   BufferAttribute,
   Scene,
@@ -32,8 +32,6 @@ export const isAvailable = (() => {
 const iOS = /(iPad|iPhone|iPod)/g.test(navigator.userAgent);
 const type = iOS ? HalfFloatType : FloatType;
 
-// TODO: use Camera instad of OrthographicCamera?
-
 export default class FBO {
   constructor({
       width,
@@ -52,7 +50,7 @@ export default class FBO {
     ]);
     
     this.renderer = renderer;
-    this.camera = new OrthographicCamera();
+    this.camera = new Camera();
     this.scene = new Scene();
     this.index = 0;
     this.copyData = true;
@@ -61,7 +59,8 @@ export default class FBO {
       width,
       height,
       RGBAFormat,
-      type,
+      FloatType,
+      // type,
     );
     this.texture.needsUpdate = true;
 

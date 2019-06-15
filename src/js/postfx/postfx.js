@@ -1,6 +1,6 @@
 import {
   WebGLRenderTarget,
-  OrthographicCamera,
+  Camera,
   RGBFormat,
   BufferGeometry,
   BufferAttribute,
@@ -16,13 +16,11 @@ import { component } from 'bidello';
 import vertexShader from './postfx.vert';
 import fragmentShader from './postfx.frag';
 
-// TODO: use Camera instad of OrthographicCamera?
-
 class PostFX extends component() {
   init() {
     this.renderer = renderer;
     this.scene = new Scene();
-    this.dummyCamera = new OrthographicCamera();
+    this.dummyCamera = new Camera();
     this.geometry = new BufferGeometry();
 
     const vertices = new Float32Array([

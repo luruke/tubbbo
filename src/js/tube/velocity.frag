@@ -3,9 +3,7 @@ precision highp float;
 uniform sampler2D texture;
 uniform sampler2D uPosition;
 uniform float uTime;
-
-uniform float noiseSize; // ms({ value: 0.0, step: 0.001, range: [0, 1] })
-uniform float noiseImp; // ms({ value: 0.0, step: 0.001, range: [0, 1] })
+uniform float uLife;
 
 const int OCTAVES = 2;
 
@@ -129,7 +127,7 @@ void main() {
 
 
   if (newValue.a <= 0.0) {
-      newValue.a += 500.0;
+      newValue.a += uLife;
   } else {
      newValue.a -= 1.0;
   }

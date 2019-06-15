@@ -12,24 +12,28 @@ import {
   Texture,
   RepeatWrapping,
   MeshBasicMaterial,
+  Vector3,
 } from 'three';
 import MagicShader, { gui } from 'magicshader';
 import FBO from '../utils/fbo';
 import assets from '../assets';
+import pointer from '../utils/pointer';
 
 export default class extends component(Object3D) {
   init() {
-    const INSTANCES = 50;
+    const LIFE = 1500;
+    const INSTANCES = 150;
     const WIDTH = 64;
     const HEIGHT = INSTANCES;
     
+    this.mousePos = new Vector3();
     this.stop = false;
 
     const velocityData = new Float32Array(1 * HEIGHT * 4);
 
     for (let i = 0; i < velocityData.length; i += 4) {
       // velocityData[i + 3] = i / velocityData.length; // take the alpha part
-      velocityData[i + 3] = (i / velocityData.length) * 500.0; // take the alpha part
+      velocityData[i + 3] = (i / velocityData.length) * LIFE; // take the alpha part
     }
 
     this.velocity = new FBO({
@@ -40,6 +44,8 @@ export default class extends component(Object3D) {
       shader: require('./velocity.frag'),
       uniforms: {
         uTime: { value: 0 },
+        uLife: { value: LIFE }
+        // uMousePos: { value: this.mousePos }
       },
     });
 
@@ -50,7 +56,8 @@ export default class extends component(Object3D) {
       shader: require('./position.frag'),
       uniforms: {
         uTime: { value: 0 },
-        velocity: { value: this.velocity.target }
+        velocity: { value: this.velocity.target },
+        uMousePos: { value: this.mousePos }
       },
     });
 
@@ -133,7 +140,8 @@ export default class extends component(Object3D) {
       },
       uniforms: {
         uData: { value: this.curvepos.target },
-        uMatcap: { value: this.matcap }
+        uMatcap: { value: this.matcap },
+        uMousePos: { value: this.mousePos }
       },
       // side: DoubleSide,
       vertexShader: require('./tube.vert'),
@@ -150,7 +158,13 @@ export default class extends component(Object3D) {
     this.stop = !this.stop;
   }
 
+  // onPointerMove({ pointer }) {
+    
+  // }
+
   onRaf({ delta }) {
+    this.mousePos.lerp(pointer.world, .1);
+
     if (this.stop) {
       return;
     }
