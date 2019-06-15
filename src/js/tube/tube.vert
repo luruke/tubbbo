@@ -13,7 +13,7 @@ uniform mat4 projectionMatrix;
 uniform mat3 normalMatrix;
 uniform sampler2D uData;
 
-varying vec2 vUv;
+varying float vProgress;
 varying vec3 vNormal;
 varying vec3 vViewPosition;
 varying float vAo;
@@ -21,13 +21,15 @@ varying float vAo;
 const float pixelWidth = 1.0 / (RESOLUTION.x);
 
 void main(){
-  vUv = uv;
   vec2 volume = vec2(0.8, 0.8);
 
+  float progress = 1.0 - (position.x + 1.0) / 2.0;
+  vProgress = progress;
+
   // https://mattdesl.svbtle.com/shaping-curves-with-parametric-equations
-  vec3 cur = texture2D(uData, vec2(vUv.y, aIndex)).xyz;
-  vec3 next = texture2D(uData, vec2(vUv.y - pixelWidth, aIndex)).xyz;
-  vec3 next2 = texture2D(uData, vec2(vUv.y - pixelWidth * 2.0, aIndex)).xyz;
+  vec3 cur = texture2D(uData, vec2(progress, aIndex)).xyz;
+  vec3 next = texture2D(uData, vec2(progress - pixelWidth, aIndex)).xyz;
+  vec3 next2 = texture2D(uData, vec2(progress - pixelWidth * 2.0, aIndex)).xyz;
 
   // compute the Frenet-Serret frame
   vec3 T = normalize(next - cur);
@@ -40,26 +42,25 @@ void main(){
   float circY = sin(tubeAngle);
 
   vec3 calculatedNormal = normalize(B * circX + N * circY);
-
-  if (vUv.y <= 0.02 || vUv.y >= 0.98) {
-    calculatedNormal = normalize(cur - next);
-  }
-
   vNormal = normalize(normalMatrix * calculatedNormal);
 
-  vec3 pos = cur + B * volume.x * circX + N * volume.y * circY;
-
+  // vec3 pos = cur + B * volume.x * circX + N * volume.y * circY;
+  vec3 pos = cur + calculatedNormal * 0.8;
 
   vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
   vViewPosition = - mvPosition.xyz;
-
-  // vAo = length(normalize(cross(cur, next)));
-  // vAo = 1.0 - length(normalize(cur - next));
 
   vAo = length(abs(cross(
     normalize(cur - next),
     normalize(next - next2)
   )));
 
-  gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
+  if (position.x > 0.49) {
+    vNormal = normalize(cur - next);
+  }
+  // } else if (vProgress == 1.0) {
+  //   vNormal = normalize(next - cur);
+  // }
+
+  gl_Position = projectionMatrix * mvPosition;
 }

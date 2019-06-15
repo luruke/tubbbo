@@ -11,6 +11,7 @@ import {
   InstancedBufferAttribute,
   Texture,
   RepeatWrapping,
+  MeshBasicMaterial,
 } from 'three';
 import MagicShader, { gui } from 'magicshader';
 import FBO from '../utils/fbo';
@@ -18,7 +19,7 @@ import assets from '../assets';
 
 export default class extends component(Object3D) {
   init() {
-    const INSTANCES = 500;
+    const INSTANCES = 50;
     const WIDTH = 64;
     const HEIGHT = INSTANCES;
     
@@ -28,7 +29,6 @@ export default class extends component(Object3D) {
 
     for (let i = 0; i < velocityData.length; i += 4) {
       velocityData[i + 3] = i / velocityData.length; // take the alpha part
-      // velocityData[i + 3] = 200;
     }
 
     this.velocity = new FBO({
@@ -64,10 +64,32 @@ export default class extends component(Object3D) {
     const radialSegment = 20;// 50;
     const heightSegment = 150;// 50;
 
-    const cylinder = new CylinderBufferGeometry(1, 1, 1, radialSegment, heightSegment, true);
+    const cylinder = new CylinderBufferGeometry(1, 1, 1, radialSegment, heightSegment, false);
     cylinder.rotateZ(Math.PI / 2);
 
     this.geometry = new InstancedBufferGeometry().copy(cylinder);
+
+    // const pp = this.geometry.attributes.position.array;
+    // let min = undefined;
+    // let max = undefined;
+    // for (let i = 0; i < pp.length; i+=4) {
+    //   let x = pp[i + 0]
+    //   let y = pp[i + 1]
+    //   let z = pp[i + 2]
+
+    //   let t = y;
+
+    //   if (t < min || typeof min === 'undefined') {
+    //     min = t;
+    //   }
+
+    //   if (t > max || typeof max === 'undefined') {
+    //     max = t;
+    //   }
+    // }
+
+    // console.log('min ', min);
+    // console.log('max ', max);
 
     const tmp = new Vector2();
     const angles = [];

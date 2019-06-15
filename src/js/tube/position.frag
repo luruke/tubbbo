@@ -32,9 +32,9 @@ void main() {
 
     float t = 0.2;
 
-    float time = (sin(uTime + uv.y * 40.0) + 1.0) / 2.0;
+    // float time = (sin(uTime + uv.y * 40.0) + 1.0) / 2.0;
 
-    t += qinticOut(1.0 - uv.x) * 0.8 * time;
+    // t += qinticOut(1.0 - uv.x) * 0.8;
 
     oldValues.xyz = mix(oldValues.xyz, toFollow, t);
   }
