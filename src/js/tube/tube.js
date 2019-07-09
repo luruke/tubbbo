@@ -193,8 +193,8 @@ export default class extends component(Object3D) {
       return;
     }
 
-    this.curvepos.uniforms.uTime.value += delta;
-    this.velocity.uniforms.uTime.value += delta;
+    this.curvepos.uniforms.uTime.value += delta * 2;
+    this.velocity.uniforms.uTime.value += delta * 2;
 
     this.velocity.uniforms.uPosition.value = this.curvepos.target;
     this.velocity.update();
